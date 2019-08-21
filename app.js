@@ -36,7 +36,7 @@ var budgetController = (function () {
 
             if (obj.type === 'inc') {
                 newItem = new Income(obj);
-            } if (obj.type === 'exp') {
+            } else if (obj.type === 'exp') {
                 newItem = new Expense(obj);
             }
 
@@ -52,11 +52,13 @@ var UIController = (function () {
         inputType: '.add__type',
         inputDescription: '.add__description',
         inputValue: '.add__value',
-        inputBtn: '.add__btn'
+        inputBtn: '.add__btn',
+        incomeContainer: '.income__list',
+        expenseContainer: '.expenses__list'
     }
 
     return {
-        getDomStrings: function() {
+        getDomStrings: function () {
             return domString;
         },
 
@@ -69,6 +71,35 @@ var UIController = (function () {
                 description: description,
                 value: value
             }
+        },
+
+        addListItem: function (obj, type) {
+            var html, idName, element;
+            html = '';
+            idName = type === 'inc' ? 'income' : 'expense';
+
+            html += '<div class="item clearfix" id="' + idName + '-' + obj.id + '">';
+            html += '<div class="item__description">' + obj.description + '</div>';
+            html += '<div class="right clearfix">';
+
+            if (type === 'inc') {
+                html += '<div class="item__value">+ ' + obj.value + '</div>';
+
+                element = domString.incomeContainer;
+            } else if (type === 'exp') {
+                html += '<div class="item__value">- ' + obj.value + '</div>';
+                html += '<div class="item__percentage">21%</div>';
+
+                element = domString.expenseContainer;
+            }
+            
+            html += '<div class="item__delete">';
+            html += '<button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+
+            document.querySelector(element).insertAdjacentHTML('beforeend', html);
         }
     }
 })();
@@ -85,6 +116,7 @@ var controller = (function (budgetCtrl, UICtrl) {
         newItem = budgetCtrl.addItem(input);
 
         // 3. Add the item to the UI
+        UICtrl.addListItem(newItem, input.type);
         // 4. Calculate the budget
         // 5. Display the budget on the Ui
     }
