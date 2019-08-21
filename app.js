@@ -1,14 +1,14 @@
 var budgetController = (function () {
-    function Income (id, description, value) {
-        this.id = id;
-        this.description = description;
-        this.value = value;
+    function Income (obj) {
+        this.id = obj.id;
+        this.description = obj.description;
+        this.value = obj.value;
     }
 
-    function Expense (id, description, value) {
-        this.id = id;
-        this.description = description;
-        this.value = value;
+    function Expense (obj) {
+        this.id = obj.id;
+        this.description = obj.description;
+        this.value = obj.value;
     }
 
     var data = {
@@ -19,6 +19,30 @@ var budgetController = (function () {
         totals: {
             inc: 0,
             exp: 0
+        }
+    }
+
+    return {
+        addItem: function (obj) {
+            var newItem, type;
+
+            type = data.allItems[obj.type];
+
+            if (type.length === 0) {
+                obj.id = 1;
+            } else {
+                obj.id = type[type.length - 1].id + 1;
+            }
+
+            if (obj.type === 'inc') {
+                newItem = new Income(obj);
+            } if (obj.type === 'exp') {
+                newItem = new Expense(obj);
+            }
+
+            type.push(newItem);
+
+            return newItem;
         }
     }
 })();
@@ -53,10 +77,13 @@ var controller = (function (budgetCtrl, UICtrl) {
     var domString = UICtrl.getDomStrings();
 
     function ctrlAddItem () {
+        var input, newItem;
         // 1. Get the field input date
-        var input = UICtrl.getInput();
+        input = UICtrl.getInput();
 
         // 2. Add the item to the budget controller
+        newItem = budgetCtrl.addItem(input);
+
         // 3. Add the item to the UI
         // 4. Calculate the budget
         // 5. Display the budget on the Ui
