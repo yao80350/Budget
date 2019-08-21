@@ -1,5 +1,26 @@
 var budgetController = (function () {
+    function Income (id, description, value) {
+        this.id = id;
+        this.description = description;
+        this.value = value;
+    }
 
+    function Expense (id, description, value) {
+        this.id = id;
+        this.description = description;
+        this.value = value;
+    }
+
+    var data = {
+        allItems: {
+            inc: [],
+            exp: []
+        },
+        totals: {
+            inc: 0,
+            exp: 0
+        }
+    }
 })();
 
 var UIController = (function () {
@@ -31,7 +52,7 @@ var UIController = (function () {
 var controller = (function (budgetCtrl, UICtrl) {
     var domString = UICtrl.getDomStrings();
 
-    function ctrlAddItem() {
+    function ctrlAddItem () {
         // 1. Get the field input date
         var input = UICtrl.getInput();
 
@@ -41,7 +62,7 @@ var controller = (function (budgetCtrl, UICtrl) {
         // 5. Display the budget on the Ui
     }
 
-    var setupEventListeners = function () {
+    function setupEventListeners () {
         document.querySelector(domString.inputBtn).addEventListener('click', ctrlAddItem);
 
         document.addEventListener('keydown', function(event) {
