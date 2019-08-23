@@ -66,6 +66,7 @@ var UIController = (function () {
             var type = document.querySelector(domString.inputType).value; // inc(+) or exp(-)
             var description = document.querySelector(domString.inputDescription).value;
             var value = document.querySelector(domString.inputValue).value;
+            
             return {
                 type: type,
                 description: description,
@@ -100,6 +101,15 @@ var UIController = (function () {
             html += '</div>';
 
             document.querySelector(element).insertAdjacentHTML('beforeend', html);
+        },
+
+        clearInput: function () {
+            var fields = document.querySelectorAll(domString.inputDescription + ', ' + domString.inputValue);
+            // Array.prototype.slice.call(fields);
+            fields.forEach(function(item) {
+                item.value = '';
+            });
+            fields[0].focus();
         }
     }
 })();
@@ -117,6 +127,7 @@ var controller = (function (budgetCtrl, UICtrl) {
 
         // 3. Add the item to the UI
         UICtrl.addListItem(newItem, input.type);
+        UICtrl.clearInput();
         // 4. Calculate the budget
         // 5. Display the budget on the Ui
     }
