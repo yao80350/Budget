@@ -65,12 +65,12 @@ var UIController = (function () {
         getInput: function() {
             var type = document.querySelector(domString.inputType).value; // inc(+) or exp(-)
             var description = document.querySelector(domString.inputDescription).value;
-            var value = document.querySelector(domString.inputValue).value;
+            var value = parseFloat(document.querySelector(domString.inputValue).value);
             
             return {
                 type: type,
-                description: description,
-                value: value
+                description: description.trim(),
+                value: parseFloat(value)
             }
         },
 
@@ -117,19 +117,32 @@ var UIController = (function () {
 var controller = (function (budgetCtrl, UICtrl) {
     var domString = UICtrl.getDomStrings();
 
+    function updateBudget() {
+        // 1. Calculate the budget
+        // 2. Return the budget
+        // 3. Display the budget on the UI
+    }
+
     function ctrlAddItem () {
         var input, newItem;
         // 1. Get the field input date
         input = UICtrl.getInput();
+
+        if (input.description === '' || isNaN(input.value) || input.value <= 0) {
+            return;
+        }
 
         // 2. Add the item to the budget controller
         newItem = budgetCtrl.addItem(input);
 
         // 3. Add the item to the UI
         UICtrl.addListItem(newItem, input.type);
+        
+        // 4. Clear the fields
         UICtrl.clearInput();
-        // 4. Calculate the budget
-        // 5. Display the budget on the Ui
+
+        // 5. Calculate and the budget
+        updateBudget();
     }
 
     function setupEventListeners () {
