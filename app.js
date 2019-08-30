@@ -1,4 +1,17 @@
 var budgetController = (function () {
+    var data = {
+        allItems: {
+            inc: [],
+            exp: []
+        },
+        totals: {
+            inc: 0,
+            exp: 0
+        },
+        budget: 0,
+        percentage: -1
+    }
+
     function Income (obj) {
         this.id = obj.id;
         this.description = obj.description;
@@ -11,15 +24,14 @@ var budgetController = (function () {
         this.value = obj.value;
     }
 
-    var data = {
-        allItems: {
-            inc: [],
-            exp: []
-        },
-        totals: {
-            inc: 0,
-            exp: 0
-        }
+    function calculateTotal (type) {
+        var sum = 0;
+
+        data.allItems[type].forEach(function(cur) {
+            sum += cur.value;
+        });
+
+        data.totals[type] = sum;
     }
 
     return {
@@ -43,6 +55,25 @@ var budgetController = (function () {
             type.push(newItem);
 
             return newItem;
+        },
+        calculateBudget: function() {
+            // calculate income and expenses
+            calculateTotal("inc");
+            calculateTotal("exp");
+
+            // calculate budget: income - expenses
+            data.budget = data.totals.inc - data.totals.exp;
+
+            // calculate expenses percentage: expenses / income
+            data.percentage = Math.round(data.totals.exp / data.totals.inc * 100);
+        },
+        getBudget: function() {
+            return {
+                totalInc: data.totals.inc,
+                totalExp: data.totals.exp,
+                budget: data.budget,
+                percentage: data.percentage
+            }
         }
     }
 })();
@@ -119,8 +150,13 @@ var controller = (function (budgetCtrl, UICtrl) {
 
     function updateBudget() {
         // 1. Calculate the budget
+        budgetCtrl.calculateBudget();
+
         // 2. Return the budget
+        var budget = budgetCtrl.getBudget();
+
         // 3. Display the budget on the UI
+        console.log(budget);
     }
 
     function ctrlAddItem () {
