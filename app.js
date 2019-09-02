@@ -56,6 +56,12 @@ var budgetController = (function () {
 
             return newItem;
         },
+        removeItem: function (type, ID) {
+            var items = data.allItems[type];
+            data.allItems[type] = items.filter(function(cur) {
+                return cur.id != ID;
+            });
+        },
         calculateBudget: function() {
             // calculate income and expenses
             calculateTotal("inc");
@@ -93,7 +99,8 @@ var UIController = (function () {
         bugetLabel: '.budget__value',
         incomeLabel: '.budget__income--value',
         expensesLabel: '.budget__expenses--value',
-        percentageLabel: '.budget__expenses--percentage'
+        percentageLabel: '.budget__expenses--percentage',
+        container: '.container'
     }
 
     return {
@@ -150,6 +157,10 @@ var UIController = (function () {
             document.querySelector(element).insertAdjacentHTML('beforeend', html);
         },
 
+        deleteListItem: function(item) {
+            item.parentNode.removeChild(item);
+        },
+
         clearInput: function () {
             var fields = document.querySelectorAll(domString.inputDescription + ', ' + domString.inputValue);
             // Array.prototype.slice.call(fields);
@@ -197,6 +208,18 @@ var controller = (function (budgetCtrl, UICtrl) {
         updateBudget();
     }
 
+    function ctrldeleteItem (event) {
+        var item = event.target.parentNode.parentNode.parentNode.parentNode;
+        var splitID = item.id.split('-');
+        var type = splitID[0].slice(0, 3);
+        var id = splitID[1];
+        
+        UICtrl.deleteListItem(item);
+        
+        budgetCtrl.removeItem(type, id);
+        updateBudget();
+    }
+
     function setupEventListeners () {
         document.querySelector(domString.inputBtn).addEventListener('click', ctrlAddItem);
 
@@ -206,6 +229,8 @@ var controller = (function (budgetCtrl, UICtrl) {
                 ctrlAddItem();
             }
         });
+
+        document.querySelector(domString.container).addEventListener('click', ctrldeleteItem);
     };
 
     return {
