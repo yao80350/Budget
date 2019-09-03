@@ -22,6 +22,8 @@ var budgetController = (function () {
         this.id = obj.id;
         this.description = obj.description;
         this.value = obj.value;
+        this.percentage = obj.percentage;
+
     }
 
     function calculateTotal (type) {
@@ -49,6 +51,11 @@ var budgetController = (function () {
             if (obj.type === 'inc') {
                 newItem = new Income(obj);
             } else if (obj.type === 'exp') {
+                if (data.totals.inc > 0) {
+                    obj.percentage = Math.round(obj.value / data.totals.inc * 100) + "%";
+                } else {
+                    obj.percentage = "---";
+                }
                 newItem = new Expense(obj);
             }
 
@@ -143,7 +150,7 @@ var UIController = (function () {
                 element = domString.incomeContainer;
             } else if (type === 'exp') {
                 html += '<div class="item__value">- ' + obj.value + '</div>';
-                html += '<div class="item__percentage">21%</div>';
+                html += '<div class="item__percentage">' + obj.percentage + '</div>';
 
                 element = domString.expenseContainer;
             }
@@ -206,6 +213,7 @@ var controller = (function (budgetCtrl, UICtrl) {
 
         // 5. Calculate and the budget
         updateBudget();
+
     }
 
     function ctrldeleteItem (event) {
@@ -218,6 +226,8 @@ var controller = (function (budgetCtrl, UICtrl) {
         
         budgetCtrl.removeItem(type, id);
         updateBudget();
+        
+
     }
 
     function setupEventListeners () {
