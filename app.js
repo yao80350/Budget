@@ -30,6 +30,7 @@ var budgetController = (function () {
         var sum = 0;
 
         data.allItems[type].forEach(function(cur) {
+            console.log(cur);
             sum += cur.value;
         });
 
@@ -112,10 +113,14 @@ var UIController = (function () {
 
     return {
         displayBudget: function(budget) {
-
-            document.querySelector(domString.bugetLabel).textContent = budget.budget > 0 ? '+' + budget.budget : budget.budget;
-            document.querySelector(domString.incomeLabel).textContent = budget.totalInc > 0 ? '+' + budget.totalInc : budget.totalInc;
-            document.querySelector(domString.expensesLabel).textContent = budget.totalExp > 0 ? '-' + budget.totalExp : budget.totalExp;
+            var bugetVal, totalInc, totalExp;
+            bugetVal = this.formatNumber(budget.budget);;
+            totalInc = this.formatNumber(budget.totalInc);
+            totalExp = this.formatNumber(budget.totalExp);
+            
+            document.querySelector(domString.bugetLabel).textContent = budget.budget > 0 ? '+' + bugetVal : bugetVal;
+            document.querySelector(domString.incomeLabel).textContent = budget.totalInc > 0 ? '+' + totalInc : totalInc;
+            document.querySelector(domString.expensesLabel).textContent = budget.totalExp > 0 ? '-' + totalExp : totalExp;
             document.querySelector(domString.percentageLabel).textContent = budget.percentage > 0 ? budget.percentage + "%" : '---';
             
         },
@@ -131,7 +136,7 @@ var UIController = (function () {
             return {
                 type: type,
                 description: description.trim(),
-                value: parseFloat(value)
+                value: value
             }
         },
 
@@ -145,11 +150,11 @@ var UIController = (function () {
             html += '<div class="right clearfix">';
 
             if (type === 'inc') {
-                html += '<div class="item__value">+ ' + obj.value + '</div>';
+                html += '<div class="item__value">+ ' + this.formatNumber(obj.value) + '</div>';
 
                 element = domString.incomeContainer;
             } else if (type === 'exp') {
-                html += '<div class="item__value">- ' + obj.value + '</div>';
+                html += '<div class="item__value">- ' + this.formatNumber(obj.value) + '</div>';
                 html += '<div class="item__percentage">' + obj.percentage + '</div>';
 
                 element = domString.expenseContainer;
@@ -175,6 +180,20 @@ var UIController = (function () {
                 item.value = '';
             });
             fields[0].focus();
+        },
+        formatNumber(num) {
+            // 2000350.1 => 2,000,350.10
+            var numSplit, intPart, intArr, intLen;
+            num = Math.abs(num);
+            num = num.toFixed(2);
+            numSplit = num.split(".");
+            intPart = numSplit[0];
+            intArr = Array.prototype.slice.call(intPart); //make string to array
+            intLen = intArr.length;
+            for (var i = intLen - 3; i > 0; i -= 3) {
+                intArr.splice(i, 0, ',');
+            }
+            return intArr.join("") + "." + numSplit[1];
         }
     }
 })();
