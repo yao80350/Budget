@@ -108,7 +108,8 @@ var UIController = (function () {
         incomeLabel: '.budget__income--value',
         expensesLabel: '.budget__expenses--value',
         percentageLabel: '.budget__expenses--percentage',
-        container: '.container'
+        container: '.container',
+        DateLabel: '.budget__title--month'
     }
 
     return {
@@ -124,6 +125,16 @@ var UIController = (function () {
             document.querySelector(domString.percentageLabel).textContent = budget.percentage > 0 ? budget.percentage + "%" : '---';
             
         },
+
+        displayDate: function() {
+            var now, months, month, year;
+            now = new Date();
+            months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            month = now.getMonth();
+            year = now.getFullYear();
+            document.querySelector(domString.DateLabel).textContent = months[month] + " " + year;
+        },
+
         getDomStrings: function () {
             return domString;
         },
@@ -181,7 +192,7 @@ var UIController = (function () {
             });
             fields[0].focus();
         },
-        formatNumber(num) {
+        formatNumber: function(num) {
             // 2000350.1 => 2,000,350.10
             var numSplit, intPart, intArr, intLen;
             num = Math.abs(num);
@@ -194,6 +205,17 @@ var UIController = (function () {
                 intArr.splice(i, 0, ',');
             }
             return intArr.join("") + "." + numSplit[1];
+        },
+        changedType: function() {
+            var elems = document.querySelectorAll(
+                domString.inputType + ',' +
+                domString.inputDescription  + ',' +
+                domString.inputValue
+            );
+            elems.forEach(function(elem) {
+                elem.classList.toggle('red-focus');
+            });
+            document.querySelector(domString.inputBtn).classList.toggle('red');
         }
     }
 })();
@@ -260,6 +282,8 @@ var controller = (function (budgetCtrl, UICtrl) {
         });
 
         document.querySelector(domString.container).addEventListener('click', ctrldeleteItem);
+
+        document.querySelector(domString.inputType).addEventListener('change', UICtrl.changedType);
     };
 
     return {
@@ -270,6 +294,7 @@ var controller = (function (budgetCtrl, UICtrl) {
                 budget: 0,
                 percentage: '-1'
             }
+            UICtrl.displayDate();
             UICtrl.displayBudget(budget);
             setupEventListeners(budget);
         }
