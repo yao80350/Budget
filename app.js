@@ -30,7 +30,6 @@ var budgetController = (function () {
         var sum = 0;
 
         data.allItems[type].forEach(function(cur) {
-            console.log(cur);
             sum += cur.value;
         });
 
@@ -64,6 +63,9 @@ var budgetController = (function () {
 
             return newItem;
         },
+        saveData: function(items) {
+            data.allItems = items;
+        },
         removeItem: function (type, ID) {
             var items = data.allItems[type];
             data.allItems[type] = items.filter(function(cur) {
@@ -77,6 +79,7 @@ var budgetController = (function () {
 
             // calculate budget: income - expenses
             data.budget = data.totals.inc - data.totals.exp;
+            console.log(data.budget);
 
             // calculate expenses percentage: expenses / income
             if (data.totals.inc > 0) {
@@ -92,6 +95,9 @@ var budgetController = (function () {
                 budget: data.budget,
                 percentage: data.percentage
             }
+        },
+        getAllItems: function() {
+            return data.allItems;
         }
     }
 })();
@@ -119,7 +125,7 @@ var UIController = (function () {
             totalInc = this.formatNumber(budget.totalInc);
             totalExp = this.formatNumber(budget.totalExp);
             
-            document.querySelector(domString.bugetLabel).textContent = budget.budget > 0 ? '+' + bugetVal : bugetVal;
+            document.querySelector(domString.bugetLabel).textContent = budget.budget > 0 ? '+' + bugetVal : '-' + bugetVal;
             document.querySelector(domString.incomeLabel).textContent = budget.totalInc > 0 ? '+' + totalInc : totalInc;
             document.querySelector(domString.expensesLabel).textContent = budget.totalExp > 0 ? '-' + totalExp : totalExp;
             document.querySelector(domString.percentageLabel).textContent = budget.percentage > 0 ? budget.percentage + "%" : '---';
@@ -232,6 +238,8 @@ var controller = (function (budgetCtrl, UICtrl) {
 
         // 3. Display the budget on the UI
         UICtrl.displayBudget(budget);
+
+        localStorage.setItem('allItems', JSON.stringify(budgetCtrl.getAllItems()));
     }
 
     function ctrlAddItem () {
@@ -271,6 +279,29 @@ var controller = (function (budgetCtrl, UICtrl) {
 
     }
 
+    function displayStorage() { 
+        var allItems = JSON.parse(localStorage.getItem('allItems'));
+        if(!allItems) {
+            return;
+        }
+        budgetCtrl.saveData(allItems);
+        
+        var inc = allItems.inc;
+        var exp = allItems.exp;
+        
+        if (inc.length > 0) {
+            inc.forEach(function(cur){
+                UICtrl.addListItem(cur, 'inc');
+            });
+        }
+        if (exp.length > 0) {
+            exp.forEach(function(cur){
+                UICtrl.addListItem(cur, 'exp');
+            });
+        }
+        updateBudget();
+    }
+
     function setupEventListeners () {
         document.querySelector(domString.inputBtn).addEventListener('click', ctrlAddItem);
 
@@ -297,6 +328,7 @@ var controller = (function (budgetCtrl, UICtrl) {
             UICtrl.displayDate();
             UICtrl.displayBudget(budget);
             setupEventListeners(budget);
+            displayStorage();
         }
     }
 })(budgetController, UIController);
